@@ -115,13 +115,14 @@ export async function GET(request: Request) {
         rpcCall<string>("eth_getTransactionCount", [query, "latest"])
       ]);
       const isContract = Boolean(code && code !== "0x");
+      const codeLengthBytes = code ? Math.max(0, (code.length - 2) / 2) : 0;
 
       return NextResponse.json({
         checks: [
           `Type: ${isContract ? "contract" : "wallet / EOA"}`,
           `Balance: ${hexWeiToOpn(balanceHex)} OPN`,
           `Nonce: ${hexToNumber(nonceHex)}`,
-          `Code size: ${isContract ? `${Math.max(0, (code.length - 2) / 2)} bytes` : "0 bytes"}`
+          `Code size: ${isContract ? `${codeLengthBytes} bytes` : "0 bytes"}`
         ],
         explorerUrl: explorerUrl("address", query),
         found: true,
