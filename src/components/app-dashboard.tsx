@@ -32,12 +32,21 @@ type DeFiSnapshot = {
   totalTvl: number;
 };
 type MarketAsset = { changePercent: number | null; close: number | null; status: string; symbol: string; volume: number | null };
+type YieldPool = {
+  apy: number;
+  chain: string;
+  ilRisk: string;
+  project: string;
+  stablecoin: boolean;
+  symbol: string;
+  tvlUsd: number;
+};
 
 const criteria = [
   ["OPN integration", "30%", "Live RPC health, Chain ID 984 wallet checks, explorer-ready architecture."],
   ["Technical quality", "25%", "Typed API routes, deterministic risk engine, safe read-only defaults."],
   ["Product and UX", "20%", "Wallet readiness score, transaction inspector, feedback triage."],
-  ["Innovation", "15%", "Safety cockpit combining DeFi, calldata review, and RWA watchlists."],
+  ["Innovation", "15%", "Intent receipts, protocol trust scoring, recovery playbooks, and DeFi blind-spot mapping."],
   ["Commitment", "10%", "Roadmap, feedback loop, and measurable next milestones."]
 ] as const;
 
@@ -82,6 +91,36 @@ export function AppDashboard() {
         </div>
         <div className="lg:col-span-2">
           <MarketWatch />
+        </div>
+        <div className="lg:col-span-2">
+          <BridgeRiskLab />
+        </div>
+        <div className="lg:col-span-2">
+          <ApprovalHygiene />
+        </div>
+        <div className="lg:col-span-2">
+          <LiquidityRiskLab />
+        </div>
+        <div className="lg:col-span-2">
+          <YieldRadar />
+        </div>
+        <div className="lg:col-span-2">
+          <ProtocolCoverage />
+        </div>
+        <div className="lg:col-span-2">
+          <IntentFirewall />
+        </div>
+        <div className="lg:col-span-2">
+          <RecoveryPlaybook />
+        </div>
+        <div className="lg:col-span-2">
+          <IntentReceipt />
+        </div>
+        <div className="lg:col-span-2">
+          <ProtocolTrustScore />
+        </div>
+        <div className="lg:col-span-2">
+          <BlindSpotMap />
         </div>
         <div className="lg:col-span-2">
           <Roadmap />
@@ -437,7 +476,17 @@ function MarketWatch() {
   return (
     <Panel icon={<BarChart3 />} title="RWA and market watch" description="Read-only Stooq public CSV watchlist for TSLA, NVDA, AAPL, COIN, MSTR, and GLD.">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {assets.map((asset) => (
+        {(assets.length > 0
+          ? assets
+          : [
+              { changePercent: null, close: null, status: "Watch only", symbol: "TSLA", volume: null },
+              { changePercent: null, close: null, status: "Watch only", symbol: "NVDA", volume: null },
+              { changePercent: null, close: null, status: "Watch only", symbol: "AAPL", volume: null },
+              { changePercent: null, close: null, status: "Watch only", symbol: "COIN", volume: null },
+              { changePercent: null, close: null, status: "Watch only", symbol: "MSTR", volume: null },
+              { changePercent: null, close: null, status: "Watch only", symbol: "GLD", volume: null }
+            ]
+        ).map((asset) => (
           <div className="rounded-md border border-border bg-background/60 p-4" key={asset.symbol}>
             <div className="flex items-start justify-between">
               <div>
@@ -458,6 +507,354 @@ function MarketWatch() {
       <ActionButton disabled={loading} onClick={load}>
         {loading ? "Loading..." : "Refresh market data"}
       </ActionButton>
+    </Panel>
+  );
+}
+
+function BridgeRiskLab() {
+  const [amount, setAmount] = useState("100");
+  const [source, setSource] = useState("Ethereum");
+  const [destination, setDestination] = useState("OPN Chain");
+  const risky = source === destination || !amount || Number(amount) <= 0;
+
+  return (
+    <Panel icon={<ArrowDownUp />} title="Bridge risk lab" description="Pre-flight bridge checklist inspired by real bridge flows, without moving funds.">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <SelectBox label="Source chain" value={source} values={["Ethereum", "Base", "BSC", "Arbitrum", "OPN Chain"]} onChange={setSource} />
+        <SelectBox label="Destination chain" value={destination} values={["OPN Chain", "Ethereum", "Base", "BSC", "Arbitrum"]} onChange={setDestination} />
+        <TokenInput label="Amount" token="OPN" value={amount} onChange={setAmount} />
+      </div>
+      <div className={cn("rounded-md border p-4", risky ? "border-amber-300/30 bg-amber-300/10 text-amber-100" : "border-emerald-300/30 bg-emerald-300/10 text-emerald-100")}>
+        <p className="font-semibold">{risky ? "Bridge route needs review" : "Bridge route is ready for simulation"}</p>
+        <p className="mt-2 text-sm">
+          Verify official bridge URL, recipient address, source chain, destination chain, final token, fees, and estimated arrival before signing.
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {["Official bridge URL", "Recipient matches wallet", "Destination token verified", "Fallback plan known"].map((item) => (
+          <Check active={!risky} label={item} key={item} />
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function ApprovalHygiene() {
+  const rows = [
+    ["Unlimited approval", "Critical", "Avoid unless spender is verified and actively used."],
+    ["Permit signature", "High", "Treat like token spending approval."],
+    ["Router approval", "Medium", "Check spender address and revoke after use."],
+    ["Read-only balance", "Low", "No token movement or approval requested."]
+  ];
+
+  return (
+    <Panel icon={<ShieldCheck />} title="Approval hygiene" description="Approval management playbook for future revoke and allowance integrations.">
+      <div className="grid gap-3 lg:grid-cols-4">
+        {rows.map(([label, risk, text]) => (
+          <div className="rounded-md border border-border bg-background/60 p-4" key={label}>
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-semibold">{label}</p>
+              <span className="rounded-full border border-border bg-secondary px-2.5 py-1 text-xs">{risk}</span>
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">{text}</p>
+          </div>
+        ))}
+      </div>
+      <p className="rounded-md border border-amber-300/20 bg-amber-300/10 p-3 text-xs text-amber-100">
+        Next milestone: read allowances from verified token contracts and show revoke links through trusted explorers/tools.
+      </p>
+    </Panel>
+  );
+}
+
+function LiquidityRiskLab() {
+  const [move, setMove] = useState("20");
+  const priceMove = Math.max(0, Number(move) || 0);
+  const ratio = 1 + priceMove / 100;
+  const impermanentLoss = ratio > 0 ? ((2 * Math.sqrt(ratio)) / (1 + ratio) - 1) * 100 : 0;
+  const severity = Math.abs(impermanentLoss) > 2 ? "High" : Math.abs(impermanentLoss) > 0.5 ? "Medium" : "Low";
+
+  return (
+    <Panel icon={<BarChart3 />} title="Liquidity risk lab" description="Simple AMM pool risk preview for LP users before they deposit.">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <TokenInput label="Price move" token="%" value={move} onChange={setMove} />
+        <Metric label="Estimated IL" value={`${impermanentLoss.toFixed(2)}%`} />
+        <Metric label="Risk band" value={severity} />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {["Pool TVL", "Fee APR", "Token volatility", "Exit liquidity"].map((item) => (
+          <div className="rounded-md border border-border bg-background/60 p-4 text-sm text-muted-foreground" key={item}>
+            <CheckCircle2 className="mb-3 h-4 w-4 text-primary" />
+            {item} must be reviewed before LP deposit.
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function YieldRadar() {
+  const [pools, setPools] = useState<YieldPool[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const payload = (await (await fetch("/api/yield-radar", { cache: "no-store" })).json()) as { pools: YieldPool[] };
+      setPools(payload.pools);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => void load(), []);
+
+  return (
+    <Panel icon={<Database />} title="Yield risk radar" description="Free DeFiLlama Yields data for APR context and risk education.">
+      <div className="grid gap-3 lg:grid-cols-3">
+        {pools.map((pool) => (
+          <div className="rounded-md border border-border bg-background/60 p-4" key={`${pool.project}-${pool.symbol}-${pool.chain}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold">{pool.symbol}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{pool.project} - {pool.chain}</p>
+              </div>
+              <span className="rounded-full border border-border bg-secondary px-2.5 py-1 text-xs">{pool.apy.toFixed(2)}%</span>
+            </div>
+            <div className="mt-4 grid gap-2 text-xs text-muted-foreground">
+              <span>TVL: ${formatNumber(pool.tvlUsd / 1_000_000, 2)}M</span>
+              <span>IL risk: {pool.ilRisk}</span>
+              <span>{pool.stablecoin ? "Stablecoin pool" : "Volatile assets possible"}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <ActionButton disabled={loading} onClick={load}>{loading ? "Loading..." : "Refresh yield data"}</ActionButton>
+    </Panel>
+  );
+}
+
+function ProtocolCoverage() {
+  const coverage = [
+    ["Swap", "Simulator ready", "Real routing locked until trusted OPN liquidity source exists."],
+    ["Bridge", "Risk lab ready", "Official bridge verification required before execution."],
+    ["Approvals", "Inspector ready", "Allowance reader/revoke flow planned."],
+    ["Pools", "IL lab ready", "Live pool data planned after OPN DEX integrations."],
+    ["Yield", "Radar ready", "DeFiLlama context live, OPN-specific pools next."],
+    ["Portfolio", "Wallet base ready", "Explorer-backed history planned."]
+  ];
+
+  return (
+    <Panel icon={<CheckCircle2 />} title="Protocol coverage matrix" description="Shows reviewers this is a broad DeFi safety product, not a single-purpose demo.">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {coverage.map(([area, status, note]) => (
+          <div className="rounded-md border border-border bg-background/60 p-4" key={area}>
+            <p className="font-semibold">{area}</p>
+            <p className="mt-1 text-sm text-primary">{status}</p>
+            <p className="mt-3 text-sm text-muted-foreground">{note}</p>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function IntentFirewall() {
+  const [actionType, setActionType] = useState("Swap");
+  const [amount, setAmount] = useState("100");
+  const [maxUsd, setMaxUsd] = useState("250");
+  const [slippage, setSlippage] = useState("1");
+  const [allowBridge, setAllowBridge] = useState(false);
+  const [allowUnknown, setAllowUnknown] = useState(false);
+
+  const amountValue = Number(amount) || 0;
+  const maxValue = Number(maxUsd) || 0;
+  const slippageValue = Number(slippage) || 0;
+  const blockedReasons = [
+    amountValue > maxValue ? "Amount exceeds your personal max transaction policy." : "",
+    actionType === "Bridge" && !allowBridge ? "Bridge actions are blocked by your policy." : "",
+    actionType === "Unknown token" && !allowUnknown ? "Unknown token actions are blocked by your policy." : "",
+    slippageValue > 2 ? "Slippage above 2% requires manual review." : ""
+  ].filter(Boolean);
+
+  return (
+    <Panel
+      icon={<ShieldCheck />}
+      title="Intent firewall"
+      description="A personal policy layer missing from most DeFi UIs: block actions before the wallet popup."
+    >
+      <div className="grid gap-3 lg:grid-cols-4">
+        <SelectBox label="Action type" value={actionType} values={["Swap", "Bridge", "Approval", "LP deposit", "Unknown token"]} onChange={setActionType} />
+        <TokenInput label="Action size" token="USD" value={amount} onChange={setAmount} />
+        <TokenInput label="Max policy" token="USD" value={maxUsd} onChange={setMaxUsd} />
+        <TokenInput label="Max slippage" token="%" value={slippage} onChange={setSlippage} />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <PolicyToggle active={allowBridge} label="Allow bridge actions" onClick={() => setAllowBridge((value) => !value)} />
+        <PolicyToggle active={allowUnknown} label="Allow unknown tokens" onClick={() => setAllowUnknown((value) => !value)} />
+      </div>
+      <div className={cn("rounded-md border p-4", blockedReasons.length ? "border-red-400/30 bg-red-400/10 text-red-100" : "border-emerald-300/30 bg-emerald-300/10 text-emerald-100")}>
+        <p className="font-semibold">{blockedReasons.length ? "Blocked by intent firewall" : "Allowed by current policy"}</p>
+        <div className="mt-3 space-y-2 text-sm">
+          {(blockedReasons.length ? blockedReasons : ["This action fits your current personal risk policy. Still inspect calldata before signing."]).map((reason) => (
+            <p key={reason}>{reason}</p>
+          ))}
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function RecoveryPlaybook() {
+  const [action, setAction] = useState("Approval");
+  const steps: Record<string, string[]> = {
+    Approval: [
+      "Before signing: verify spender address and exact allowance.",
+      "After signing: save the transaction hash and monitor spender activity.",
+      "If suspicious: revoke allowance through a trusted allowance tool or explorer flow.",
+      "Long term: prefer exact approvals over unlimited approvals."
+    ],
+    Bridge: [
+      "Before signing: verify official bridge URL, recipient, source chain, and destination chain.",
+      "After signing: track both source and destination chain explorers.",
+      "If delayed: do not retry blindly; check bridge status and support docs first.",
+      "Long term: test small transfers before large bridge moves."
+    ],
+    Swap: [
+      "Before signing: compare route, slippage, price impact, and token addresses.",
+      "After signing: verify received amount and keep the transaction hash.",
+      "If output is wrong: report route/source data issue through feedback triage.",
+      "Long term: avoid illiquid pairs unless risk is intentional."
+    ],
+    "LP deposit": [
+      "Before signing: review impermanent loss, TVL, token volatility, and exit liquidity.",
+      "After signing: monitor fee APR versus price divergence.",
+      "If risk increases: exit before liquidity dries up.",
+      "Long term: size LP positions separately from spot holdings."
+    ]
+  };
+
+  return (
+    <Panel icon={<Lock />} title="Post-signing recovery playbook" description="Most DeFi apps stop after execution; this tells users what to do after signing.">
+      <SelectBox label="Action" value={action} values={Object.keys(steps)} onChange={setAction} />
+      <div className="grid gap-3 lg:grid-cols-4">
+        {steps[action].map((step) => (
+          <div className="rounded-md border border-border bg-background/60 p-4 text-sm text-muted-foreground" key={step}>
+            <CheckCircle2 className="mb-3 h-4 w-4 text-primary" />
+            {step}
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function IntentReceipt() {
+  const [action, setAction] = useState("Swap");
+  const [assetIn, setAssetIn] = useState("OPN");
+  const [assetOut, setAssetOut] = useState("USDC");
+  const [counterparty, setCounterparty] = useState("Verified OPN route");
+  const [limit, setLimit] = useState("250");
+
+  const receipt = `OPN intent: ${action} | give: ${assetIn} | receive: ${assetOut} | max exposure: ${limit} USD | counterparty: ${counterparty}`;
+  const receiptId = makeLocalHash(receipt);
+
+  return (
+    <Panel
+      icon={<ScanSearch />}
+      title="Pre-signing intent receipt"
+      description="A user-readable receipt created before the wallet popup, so the final signature can be compared against intent."
+    >
+      <div className="grid gap-3 lg:grid-cols-4">
+        <SelectBox label="Intent" value={action} values={["Swap", "Bridge", "Approval", "LP deposit", "Yield deposit"]} onChange={setAction} />
+        <TokenInput label="Give asset" token="" value={assetIn} onChange={setAssetIn} text />
+        <TokenInput label="Receive asset" token="" value={assetOut} onChange={setAssetOut} text />
+        <TokenInput label="Max exposure" token="USD" value={limit} onChange={setLimit} />
+      </div>
+      <input
+        className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+        onChange={(event) => setCounterparty(event.target.value)}
+        placeholder="Counterparty, route, bridge, or protocol name"
+        value={counterparty}
+      />
+      <div className="rounded-md border border-primary/30 bg-primary/10 p-4">
+        <p className="text-sm font-semibold text-primary">Local receipt #{receiptId}</p>
+        <p className="mt-3 text-sm leading-6 text-foreground">{receipt}</p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          If the wallet popup asks for a different spender, token, chain, approval size, or action, reject and inspect again.
+        </p>
+      </div>
+    </Panel>
+  );
+}
+
+function ProtocolTrustScore() {
+  const [checks, setChecks] = useState<Record<string, boolean>>({
+    source: true,
+    audit: false,
+    timelock: false,
+    bugBounty: false,
+    admin: false,
+    oracle: false
+  });
+  const rows = [
+    ["source", "Verified source code", 20],
+    ["audit", "Independent audit or public review", 20],
+    ["timelock", "Timelock or transparent upgrade delay", 15],
+    ["bugBounty", "Bug bounty or responsible disclosure path", 15],
+    ["admin", "Admin keys documented and limited", 15],
+    ["oracle", "Oracle, route, and liquidity source disclosed", 15]
+  ] as const;
+  const score = rows.reduce((total, [key, , points]) => total + (checks[key] ? points : 0), 0);
+  const grade = score >= 80 ? "Ready to monitor" : score >= 55 ? "Needs review" : "Do not integrate";
+
+  return (
+    <Panel
+      icon={<Database />}
+      title="Protocol trust score"
+      description="A due-diligence layer for protocols before they appear in swaps, bridges, pools, or yield modules."
+    >
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {rows.map(([key, label]) => (
+          <PolicyToggle
+            active={checks[key]}
+            key={key}
+            label={label}
+            onClick={() => setChecks((value) => ({ ...value, [key]: !value[key] }))}
+          />
+        ))}
+      </div>
+      <div className={cn("rounded-md border p-4", score >= 80 ? "border-emerald-300/30 bg-emerald-300/10" : score >= 55 ? "border-amber-300/30 bg-amber-300/10" : "border-red-400/30 bg-red-400/10")}>
+        <p className="text-sm font-semibold">Trust score</p>
+        <p className="mt-2 text-3xl font-bold">{score}/100</p>
+        <p className="mt-2 text-sm text-muted-foreground">{grade}. Execution should remain locked until the missing controls are verified.</p>
+      </div>
+    </Panel>
+  );
+}
+
+function BlindSpotMap() {
+  const gaps = [
+    ["Personal policy firewall", "Users set risk limits before wallet prompts appear."],
+    ["After-action recovery", "Every action has revoke, monitor, and escalation steps."],
+    ["Intent receipt", "Users compare the wallet popup against their own pre-signing intent."],
+    ["Protocol trust score", "Protocols must pass source, audit, admin, oracle, and disclosure checks before use."],
+    ["Bridge recipient discipline", "Bridge flows check recipient and destination before signing."],
+    ["LP exit thinking", "LP users see exit liquidity and impermanent loss as first-class risk."],
+    ["RWA jurisdiction lock", "Stock/RWA features remain read-only until data and contract legality are verified."],
+    ["Plain-language signing", "Every future transaction should explain what changes in the wallet."]
+  ];
+
+  return (
+    <Panel icon={<AlertTriangle />} title="DeFi blind-spot map" description="The product angle: protect users in places large DeFi apps often leave to user judgment.">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {gaps.map(([title, text]) => (
+          <div className="rounded-md border border-border bg-background/60 p-4" key={title}>
+            <p className="font-semibold">{title}</p>
+            <p className="mt-3 text-sm text-muted-foreground">{text}</p>
+          </div>
+        ))}
+      </div>
     </Panel>
   );
 }
@@ -569,24 +966,64 @@ function ResultBox({ rows, title }: { rows: string[]; title: string }) {
   );
 }
 
-function TokenInput({ label, onChange, readOnly, token, value }: { label: string; onChange?: (value: string) => void; readOnly?: boolean; token: string; value: string }) {
+function TokenInput({
+  label,
+  onChange,
+  readOnly,
+  text,
+  token,
+  value
+}: {
+  label: string;
+  onChange?: (value: string) => void;
+  readOnly?: boolean;
+  text?: boolean;
+  token: string;
+  value: string;
+}) {
   return (
     <div className="rounded-md border border-border bg-background/60 p-4">
       <p className="text-sm text-muted-foreground">{label}</p>
       <div className="mt-2 flex items-center gap-3">
         <input
           className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-          inputMode="decimal"
-          min="0"
+          inputMode={text ? undefined : "decimal"}
+          min={text ? undefined : "0"}
           onChange={(event) => onChange?.(event.target.value)}
-          placeholder="0.00"
+          placeholder={text ? "Asset name" : "0.00"}
           readOnly={readOnly}
-          type="number"
+          type={text ? "text" : "number"}
           value={value}
         />
-        <div className="min-w-20 rounded-md border border-border bg-secondary px-3 py-2 text-center text-sm font-semibold">{token}</div>
+        {token ? <div className="min-w-20 rounded-md border border-border bg-secondary px-3 py-2 text-center text-sm font-semibold">{token}</div> : null}
       </div>
     </div>
+  );
+}
+
+function SelectBox({ label, onChange, value, values }: { label: string; onChange: (value: string) => void; value: string; values: string[] }) {
+  return (
+    <div className="rounded-md border border-border bg-background/60 p-4">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <select
+        className="mt-2 h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+        onChange={(event) => onChange(event.target.value)}
+        value={value}
+      >
+        {values.map((item) => (
+          <option key={item}>{item}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function PolicyToggle({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+  return (
+    <button className="flex items-center gap-3 rounded-md border border-border bg-background/60 p-4 text-left text-sm" onClick={onClick} type="button">
+      {active ? <CheckCircle2 className="h-4 w-4 text-primary" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
+      <span className={active ? "text-foreground" : "text-muted-foreground"}>{label}</span>
+    </button>
   );
 }
 
@@ -595,4 +1032,12 @@ function riskClass(level: string) {
   if (level === "High") return "border-orange-300/30 bg-orange-300/10 text-orange-100";
   if (level === "Medium") return "border-amber-300/30 bg-amber-300/10 text-amber-100";
   return "border-emerald-300/30 bg-emerald-300/10 text-emerald-100";
+}
+
+function makeLocalHash(value: string) {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0").slice(0, 8).toUpperCase();
 }

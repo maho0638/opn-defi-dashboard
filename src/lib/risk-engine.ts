@@ -14,7 +14,13 @@ const selectors: Record<string, string> = {
   "0xd505accf": "ERC-20 permit",
   "0x23b872dd": "transferFrom",
   "0xa9059cbb": "ERC-20 transfer",
-  "0x38ed1739": "swapExactTokensForTokens"
+  "0x38ed1739": "swapExactTokensForTokens",
+  "0x3593564c": "Universal Router execute",
+  "0x414bf389": "exactInputSingle",
+  "0x5c11d795": "swapExactTokensForTokensSupportingFeeOnTransferTokens",
+  "0x40c10f19": "mint",
+  "0x3659cfe6": "upgradeTo",
+  "0x4f1ef286": "upgradeToAndCall"
 };
 
 function level(score: number): RiskLevel {
@@ -83,10 +89,40 @@ export function analyzeRiskInput(input: string): RiskResult {
     score += 25;
   }
 
+  if (lower.includes("recipient") || lower.includes("destination")) {
+    findings.push("Recipient or destination wording detected.");
+    actions.push("Confirm the final recipient and destination chain before signing.");
+    score += 15;
+  }
+
   if (lower.includes("airdrop") || lower.includes("claim") || lower.includes("reward")) {
     findings.push("Claim or reward flow detected.");
     actions.push("Confirm the URL and contract before signing.");
     score += 25;
+  }
+
+  if (lower.includes("delegatecall") || lower.includes("multicall") || lower.includes("universal router")) {
+    findings.push("Bundled or delegated execution pattern detected.");
+    actions.push("Break down every sub-call before trusting the wallet popup.");
+    score += 30;
+  }
+
+  if (lower.includes("proxy") || lower.includes("upgrade") || lower.includes("owner") || lower.includes("admin")) {
+    findings.push("Admin, proxy, or upgradeability wording detected.");
+    actions.push("Check admin keys, timelock, and upgrade authority before interacting.");
+    score += 25;
+  }
+
+  if (lower.includes("oracle") || lower.includes("price impact") || lower.includes("slippage")) {
+    findings.push("Pricing, oracle, or slippage wording detected.");
+    actions.push("Compare quote source, price impact, slippage, and stale data risk.");
+    score += 20;
+  }
+
+  if (lower.includes("lp") || lower.includes("liquidity") || lower.includes("pool") || lower.includes("farm")) {
+    findings.push("Liquidity or yield flow detected.");
+    actions.push("Review TVL, exit liquidity, impermanent loss, and reward-token risk.");
+    score += 20;
   }
 
   if (lower.includes("seed phrase") || lower.includes("private key") || lower.includes("recovery phrase")) {
