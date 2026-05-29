@@ -50,8 +50,9 @@ function hexToNumber(value?: string | null) {
 function hexWeiToOpn(value?: string | null) {
   if (!value) return "0";
   const wei = BigInt(value);
-  const whole = wei / 10n ** 18n;
-  const fraction = (wei % 10n ** 18n).toString().padStart(18, "0").slice(0, 5);
+  const weiPerOpn = BigInt("1000000000000000000");
+  const whole = wei / weiPerOpn;
+  const fraction = (wei % weiPerOpn).toString().padStart(18, "0").slice(0, 5);
   return `${whole}.${fraction}`.replace(/\.?0+$/, "");
 }
 
