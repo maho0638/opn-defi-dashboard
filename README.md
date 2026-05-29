@@ -46,6 +46,32 @@ No paid API key, no card, no custody, and no seed phrase flow.
 - Repository: `https://github.com/maho0638/opn-defi-dashboard`
 - Proof contract: `0x3cbdf2990327709ec0d1d41c50c006be74c73890`
 
+## Reviewer Verification Path
+
+1. Open the live demo and confirm the OPN health panel shows Chain ID `984`, latest block, gas, and latency.
+2. Open the reviewer evidence snapshot and verify the live RPC endpoint, source repository, and proof contract links.
+3. Use the transaction inspector examples: unlimited approval, bridge claim, and RWA token.
+4. Confirm execution is intentionally locked in the swap simulator, bridge lab, LP lab, approval hygiene, and yield sections.
+5. Review the rubric coverage map and proof pack to match visible product evidence to the five scoring categories.
+
+## Risk Engine Evidence
+
+The risk engine is deterministic and local. It does not depend on paid APIs or private user data.
+
+- Unlimited approval calldata should produce a high or critical approval warning.
+- Bridge claim text should trigger bridge, claim, and approval checks.
+- RWA/stock token text should remain read-only and warn about verified contracts and licensed data.
+- Empty input returns a safe waiting state instead of failing.
+- Unknown text still asks the user to verify chain, contract, token, value, and wallet prompt details.
+
+## Known Limitations
+
+- Real swaps, bridges, approvals, LP deposits, and yield deposits are locked by design.
+- The app does not custody assets, request seed phrases, or ask users to sign transactions.
+- OPN-specific routing and liquidity integrations are planned after trusted protocols and quote sources are available.
+- Allowance reading, revoke flows, and transaction simulation are roadmap items, not hidden production features.
+- Market and yield panels use public read-only APIs for context, not trading execution.
+
 ## Security Posture
 
 This MVP is read-only by default. It does not execute swaps, does not bridge funds, does not request approvals, does not custody funds, and never asks for seed phrases or private keys. Real execution should only be enabled after verified routing, bridge verification, transaction simulation, token allowlists, and clear signing summaries.
@@ -75,13 +101,17 @@ A DeFi safety cockpit for OPN Chain builders and early users.
 Description:
 
 ```txt
-CodeX-Builder is a DeFi safety dashboard for OPN Chain. It helps users inspect wallet readiness, OPN RPC status, transaction hashes, addresses, token allowlists, risky approvals, calldata, claim flows, bridge warnings, LP risk, yield context, market context, protocol trust, personal intent, and feedback before signing. The MVP is read-only by default and keeps swap, bridge, approval, LP, and yield execution locked until verified routing, simulation, allowance reading, and safety checks are ready. It includes a reviewer proof pack that maps the app directly to the five scoring criteria and uses mobile-friendly controls for Android/iOS browsers.
+CodeX-Builder is a read-only DeFi safety dashboard for OPN Chain builders and early users. It helps users inspect wallet readiness, OPN RPC health, Chain ID 984 status, transaction hashes, addresses, risky approvals, calldata, claim flows, bridge warnings, LP risk, yield context, market context, protocol trust, personal intent, and feedback before signing.
+
+The project integrates OPN Chain through live RPC checks, native OPN balance reading, wallet network validation, transaction/address lookup, explorer links, and an on-chain proof contract. It is designed as a safety layer before execution: swaps, bridges, approvals, LP deposits, and yield actions stay locked until verified routing, simulation, allowance reading, and audited protocol integrations are ready.
+
+The product includes an intent firewall, pre-signing intent receipt, transaction inspector, approval hygiene, bridge risk lab, liquidity risk lab, protocol trust score, recovery playbook, reviewer proof pack, and rubric coverage mapped to the judging criteria.
 ```
 
 Roadmap:
 
 ```txt
-May-June 2026: harden OPN RPC checks, improve live transaction/address lookup, add intent receipts, expand protocol trust scoring, collect reviewer feedback, and add more risk rules.
-July-September 2026: add trusted OPN quote previews, transaction simulation, allowance reading, explorer-backed wallet activity, bridge recipient verification, and backend feedback triage.
-October-December 2026: integrate audited OPN DeFi protocols, policy-based signing blocks, bridge verification, licensed RWA/market data if validated, and contribution docs for other builders.
+May-June 2026: harden OPN RPC checks, improve live transaction/address lookup, expand calldata and approval risk detection, refine the wallet readiness score, collect reviewer feedback, and improve mobile UX.
+July-September 2026: add trusted OPN quote previews, transaction simulation, allowance reading, revoke guidance, explorer-backed wallet activity, bridge recipient verification, and backend feedback triage.
+October-December 2026: integrate audited OPN DeFi protocols, policy-based signing blocks, verified bridge modules, protocol-specific safety rules, licensed RWA/market data if validated, and contribution docs for other builders.
 ```

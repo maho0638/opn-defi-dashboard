@@ -139,6 +139,9 @@ export function AppDashboard() {
       <Criteria />
       <section className="mx-auto grid w-full max-w-7xl gap-5 px-4 pb-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
         <div className="lg:col-span-2">
+          <ReviewerEvidenceSnapshot />
+        </div>
+        <div className="lg:col-span-2">
           <RubricCoverageMap />
         </div>
         <div className="lg:col-span-2">
@@ -199,6 +202,44 @@ export function AppDashboard() {
         </div>
       </section>
     </main>
+  );
+}
+
+function ReviewerEvidenceSnapshot() {
+  const proofUrl = `${opnChain.blockExplorers.default.url}/address/${proofContractAddress}`;
+  const rows = [
+    ["Live OPN usage", `Chain ID ${opnChain.id}, RPC health, block/gas/latency, wallet network validation, balance reading.`],
+    ["On-chain verification", "Transaction/address lookup through OPN RPC, explorer links, and deployed proof contract."],
+    ["User value", "Risk score, wallet readiness, approval hygiene, bridge/LP/yield labs, feedback triage, and recovery guidance."],
+    ["Execution boundary", "No custody, seed phrases, hidden approvals, or real token movement until routing and simulation are verified."]
+  ] as const;
+
+  return (
+    <Panel
+      icon={<ShieldCheck />}
+      title="Reviewer evidence snapshot"
+      description="The shortest path from the judging rubric to working product evidence."
+    >
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        {rows.map(([title, text]) => (
+          <div className="rounded-md border border-border bg-background/60 p-4" key={title}>
+            <p className="font-semibold">{title}</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{text}</p>
+          </div>
+        ))}
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <a className="rounded-md border border-primary/30 bg-primary/10 p-4 text-sm font-semibold text-primary underline-offset-4 hover:underline" href="/api/opn-health" rel="noreferrer" target="_blank">
+          Verify live OPN RPC
+        </a>
+        <a className="rounded-md border border-primary/30 bg-primary/10 p-4 text-sm font-semibold text-primary underline-offset-4 hover:underline" href={proofUrl} rel="noreferrer" target="_blank">
+          Verify proof contract
+        </a>
+        <a className="rounded-md border border-primary/30 bg-primary/10 p-4 text-sm font-semibold text-primary underline-offset-4 hover:underline" href="https://github.com/maho0638/opn-defi-dashboard" rel="noreferrer" target="_blank">
+          Review source code
+        </a>
+      </div>
+    </Panel>
   );
 }
 
