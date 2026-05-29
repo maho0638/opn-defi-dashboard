@@ -8,6 +8,7 @@ export type DashboardToken = {
   decimals: number;
   isNative?: boolean;
   name: string;
+  risk: "Low" | "Medium" | "Blocked";
   symbol: string;
 };
 
@@ -16,6 +17,7 @@ export const OPN_TOKEN: DashboardToken = {
   decimals: 18,
   isNative: true,
   name: "OPN",
+  risk: "Low",
   symbol: "OPN"
 };
 
@@ -25,5 +27,6 @@ export const USDC_TOKEN: DashboardToken = {
   chainId: opnChain.id,
   decimals: 6,
   name: "USD Coin",
+  risk: "Blocked",
   symbol: "USDC"
 };

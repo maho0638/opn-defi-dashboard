@@ -5,13 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function compactAddress(value?: string) {
+  if (!value) return "Not connected";
+  return `${value.slice(0, 6)}...${value.slice(-4)}`;
+}
+
+export function formatNumber(value: number, maximumFractionDigits = 2) {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits
+  }).format(value);
+}
+
 export function formatBalance(value?: string, symbol?: string) {
   if (!value) return `0.0000 ${symbol ?? ""}`.trim();
-
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return `${value} ${symbol ?? ""}`.trim();
-
-  return `${numeric.toLocaleString("en-US", {
-    maximumFractionDigits: numeric >= 1 ? 4 : 6
-  })} ${symbol ?? ""}`.trim();
+  return `${formatNumber(numeric, numeric >= 1 ? 4 : 6)} ${symbol ?? ""}`.trim();
 }

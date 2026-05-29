@@ -1,42 +1,27 @@
-# What you need to do
+# Updated Submission Text
 
-Follow these steps in order.
+Use this text if Builder Hub allows an update or if a new improved submission is created.
 
-## 1. Create a GitHub repository
+## Project name
 
-1. Open GitHub.
-2. Click the `+` button in the top right.
-3. Click `New repository`.
-4. Repository name: `opn-defi-dashboard`.
-5. Choose `Public`.
-6. Do not add README, .gitignore, or license from GitHub.
-7. Click `Create repository`.
+CodeX-Builder
 
-## 2. Tell me the repository URL
+## One-line slogan
 
-It should look like:
+A DeFi safety cockpit for OPN Chain builders and early users.
 
-```txt
-https://github.com/maho0638/opn-defi-dashboard
-```
+## Description
 
-After you send me that URL, I can tell you the exact commands to upload the project.
+CodeX-Builder is a DeFi safety dashboard for OPN Chain. It helps users inspect wallet readiness, OPN RPC status, token allowlists, risky approvals, calldata, claim flows, bridge warnings, market context, and feedback before signing. The MVP is read-only by default and keeps swap execution locked until verified routing, simulation, and safety checks are ready.
 
-## 3. Deploy later
+## Contracts
 
-After GitHub upload, we will connect the repo to Vercel.
-That will give us the demo URL required by Builder Hub.
+CodeXBuilderProof was deployed on OPN Chain Testnet as lightweight proof linking the Builder Hub submission to the live demo and GitHub repository.
 
-## 4. Submit to Builder Hub
+## Roadmap
 
-The form needs:
+May-June 2026: harden OPN RPC checks, improve the transaction inspector, collect reviewer feedback, and add more risk rules.
 
-- Project name
-- One-line slogan
-- Demo URL
-- Repository URL
-- Contract information
-- Description
-- Roadmap
+July-September 2026: add trusted OPN quote previews, transaction simulation, explorer-backed wallet activity, and backend feedback triage.
 
-The text is prepared in `README.md`.
+October-December 2026: integrate audited OPN DeFi protocols, licensed RWA/market data if validated, and contribution docs for other builders.
