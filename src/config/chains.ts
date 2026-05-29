@@ -1,31 +1,19 @@
 import type { Chain } from "viem";
 
-function readChainId() {
-  const value = Number(process.env.NEXT_PUBLIC_OPN_CHAIN_ID);
-  return Number.isFinite(value) && value > 0 ? value : 984;
-}
+const chainId = Number(process.env.NEXT_PUBLIC_OPN_CHAIN_ID || 984);
+const rpcUrl = process.env.NEXT_PUBLIC_OPN_RPC_URL || "https://testnet-rpc.iopn.tech";
+const explorerUrl = process.env.NEXT_PUBLIC_OPN_EXPLORER_URL || "https://testnet.iopn.tech";
 
 export const opnChain = {
-  id: readChainId(),
+  id: Number.isFinite(chainId) ? chainId : 984,
   name: "OPN Chain Testnet",
-  nativeCurrency: {
-    decimals: 18,
-    name: "OPN",
-    symbol: "OPN"
-  },
+  nativeCurrency: { decimals: 18, name: "OPN", symbol: "OPN" },
   rpcUrls: {
-    default: {
-      http: [process.env.NEXT_PUBLIC_OPN_RPC_URL || "https://testnet-rpc.iopn.tech"]
-    },
-    public: {
-      http: [process.env.NEXT_PUBLIC_OPN_RPC_URL || "https://testnet-rpc.iopn.tech"]
-    }
+    default: { http: [rpcUrl] },
+    public: { http: [rpcUrl] }
   },
   blockExplorers: {
-    default: {
-      name: "OPN Explorer",
-      url: process.env.NEXT_PUBLIC_OPN_EXPLORER_URL || "https://testnet.iopn.tech"
-    }
+    default: { name: "OPN Explorer", url: explorerUrl }
   },
   testnet: true
 } as const satisfies Chain;

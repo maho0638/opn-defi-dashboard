@@ -1,7 +1,5 @@
 # Updated Submission Text
 
-Use this text if Builder Hub allows an update or if a new improved submission is created.
-
 ## Project name
 
 CodeX-Builder

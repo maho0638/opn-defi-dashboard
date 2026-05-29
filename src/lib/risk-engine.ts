@@ -14,16 +14,10 @@ const selectors: Record<string, string> = {
   "0xd505accf": "ERC-20 permit",
   "0x23b872dd": "transferFrom",
   "0xa9059cbb": "ERC-20 transfer",
-  "0x38ed1739": "swapExactTokensForTokens",
-  "0x7ff36ab5": "swapExactETHForTokens",
-  "0x18cbafe5": "swapExactTokensForETH"
+  "0x38ed1739": "swapExactTokensForTokens"
 };
 
-function clampScore(score: number) {
-  return Math.max(0, Math.min(100, score));
-}
-
-function getLevel(score: number): RiskLevel {
+function level(score: number): RiskLevel {
   if (score >= 85) return "Critical";
   if (score >= 65) return "High";
   if (score >= 35) return "Medium";
@@ -35,11 +29,11 @@ export function analyzeRiskInput(input: string): RiskResult {
   const lower = value.toLowerCase();
   const findings: string[] = [];
   const actions: string[] = [];
-  let score = 10;
+  let score = value ? 10 : 0;
 
   if (!value) {
     return {
-      actions: ["Paste calldata, a transaction hash, a token address, or wallet popup text."],
+      actions: ["Paste calldata, a transaction hash, token address, or wallet popup text."],
       findings: ["No input provided."],
       level: "Low",
       score: 0,
@@ -49,13 +43,13 @@ export function analyzeRiskInput(input: string): RiskResult {
 
   if (/0x[a-fA-F0-9]{64}/.test(value)) {
     findings.push("Transaction hash or 32-byte value detected.");
-    actions.push("Open it in the official OPN explorer before trusting the action.");
+    actions.push("Open it in the official OPN explorer before trusting it.");
     score += 10;
   }
 
   if (/^0x[a-fA-F0-9]{40}$/.test(value)) {
     findings.push("EVM address detected.");
-    actions.push("Verify if this address is a wallet, token, router, spender, or contract.");
+    actions.push("Verify whether it is a wallet, token, router, spender, or contract.");
     score += 15;
   }
 
@@ -66,38 +60,32 @@ export function analyzeRiskInput(input: string): RiskResult {
   }
 
   if (lower.includes("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")) {
-    findings.push("Unlimited max uint approval pattern detected.");
-    actions.push("Avoid unlimited approvals unless the spender is verified and trusted.");
+    findings.push("Unlimited approval pattern detected.");
+    actions.push("Reject unlimited approvals unless the spender is verified and trusted.");
     score += 35;
   }
 
   if (lower.includes("approve") || lower.includes("approval") || lower.includes("spender")) {
     findings.push("Approval wording detected.");
-    actions.push("Check spender address and spending amount before signing.");
+    actions.push("Check spender address and amount before signing.");
     score += 30;
   }
 
   if (lower.includes("permit")) {
     findings.push("Permit signature wording detected.");
-    actions.push("Treat permit signatures like approvals; they can grant token spending rights.");
+    actions.push("Treat permit signatures like approvals.");
     score += 35;
-  }
-
-  if (lower.includes("setapprovalforall")) {
-    findings.push("Operator approval wording detected.");
-    actions.push("Do not approve all assets for unknown operators.");
-    score += 40;
-  }
-
-  if (lower.includes("airdrop") || lower.includes("claim") || lower.includes("reward")) {
-    findings.push("Claim or reward flow detected.");
-    actions.push("Confirm the URL, contract address, and whether signing grants approval.");
-    score += 25;
   }
 
   if (lower.includes("bridge")) {
     findings.push("Bridge flow detected.");
-    actions.push("Verify source chain, destination chain, recipient, and official bridge URL.");
+    actions.push("Verify source chain, destination chain, recipient, and official URL.");
+    score += 25;
+  }
+
+  if (lower.includes("airdrop") || lower.includes("claim") || lower.includes("reward")) {
+    findings.push("Claim or reward flow detected.");
+    actions.push("Confirm the URL and contract before signing.");
     score += 25;
   }
 
@@ -107,15 +95,9 @@ export function analyzeRiskInput(input: string): RiskResult {
     score += 85;
   }
 
-  if (/\b([a-z]+ ){11,23}[a-z]+\b/i.test(value)) {
-    findings.push("Possible recovery phrase pattern detected.");
-    actions.push("Stop immediately and do not paste wallet secrets into websites.");
-    score += 85;
-  }
-
   if (lower.includes("tesla") || lower.includes("tsla") || lower.includes("stock") || lower.includes("rwa")) {
     findings.push("Stock or RWA topic detected.");
-    actions.push("Keep stock/RWA features read-only until data licensing and verified token contracts are ready.");
+    actions.push("Keep RWA features read-only until licensed data and verified contracts exist.");
     score += 20;
   }
 
@@ -124,22 +106,22 @@ export function analyzeRiskInput(input: string): RiskResult {
     actions.push("Still verify chain, contract address, token address, value, and signing text.");
   }
 
-  actions.push("If the wallet popup is unclear, reject it and inspect the action first.");
+  actions.push("Reject the wallet popup if it is unclear.");
 
-  const finalScore = clampScore(score);
-  const level = getLevel(finalScore);
+  const finalScore = Math.min(100, Math.max(0, score));
+  const finalLevel = level(finalScore);
 
   return {
     actions,
     findings,
-    level,
+    level: finalLevel,
     score: finalScore,
     summary:
-      level === "Critical"
+      finalLevel === "Critical"
         ? "Critical risk. Reject this action until every detail is verified."
-        : level === "High"
-          ? "High risk. Requires manual verification before signing."
-          : level === "Medium"
+        : finalLevel === "High"
+          ? "High risk. Manual verification is required before signing."
+          : finalLevel === "Medium"
             ? "Medium risk. Review the details before continuing."
             : "Low visible risk. Continue only after normal wallet checks."
   };

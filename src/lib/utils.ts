@@ -11,14 +11,5 @@ export function compactAddress(value?: string) {
 }
 
 export function formatNumber(value: number, maximumFractionDigits = 2) {
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits
-  }).format(value);
-}
-
-export function formatBalance(value?: string, symbol?: string) {
-  if (!value) return `0.0000 ${symbol ?? ""}`.trim();
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return `${value} ${symbol ?? ""}`.trim();
-  return `${formatNumber(numeric, numeric >= 1 ? 4 : 6)} ${symbol ?? ""}`.trim();
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits }).format(value);
 }

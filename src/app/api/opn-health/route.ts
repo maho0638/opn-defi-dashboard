@@ -9,10 +9,8 @@ async function rpcCall(method: string) {
     body: JSON.stringify({ id: 1, jsonrpc: "2.0", method, params: [] }),
     cache: "no-store",
     headers: { "content-type": "application/json" },
-    method: "POST",
-    signal: AbortSignal.timeout(8000)
+    method: "POST"
   });
-
   if (!response.ok) throw new Error(`RPC ${method} failed`);
   const payload = (await response.json()) as { result?: string };
   return payload.result || "0x0";
@@ -20,14 +18,12 @@ async function rpcCall(method: string) {
 
 export async function GET() {
   const startedAt = Date.now();
-
   try {
     const [chainIdHex, blockHex, gasHex] = await Promise.all([
       rpcCall("eth_chainId"),
       rpcCall("eth_blockNumber"),
       rpcCall("eth_gasPrice")
     ]);
-
     return NextResponse.json({
       blockNumber: Number.parseInt(blockHex, 16),
       chainId: Number.parseInt(chainIdHex, 16),
@@ -37,13 +33,10 @@ export async function GET() {
       rpcUrl: opnChain.rpcUrls.default.http[0]
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "OPN RPC check failed",
-        ok: false,
-        rpcUrl: opnChain.rpcUrls.default.http[0]
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : "OPN RPC check failed",
+      ok: false,
+      rpcUrl: opnChain.rpcUrls.default.http[0]
+    });
   }
 }

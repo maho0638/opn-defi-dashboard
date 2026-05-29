@@ -10,7 +10,5 @@ export const wagmiConfig = getDefaultConfig({
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "OPN_DEV_PROJECT_ID",
   chains: [opnChain] as const,
   ssr: true,
-  transports: {
-    [opnChain.id]: http(opnChain.rpcUrls.default.http[0])
-  }
+  transports: { [opnChain.id]: http(opnChain.rpcUrls.default.http[0]) }
 });

@@ -3,7 +3,7 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 
-import { Web3Provider } from "@/providers/web3-provider";
+import { Web3Provider } from "@/components/web3-provider";
 
 export const metadata: Metadata = {
   title: "CodeX-Builder | OPN DeFi Safety Dashboard",
